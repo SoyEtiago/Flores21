@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regalo para la Mujer Más Increíble</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #87CEEB; /* Fondo azul cielo */
+        }
+        canvas {
+            display: block;
+        }
+
+        /* Estilos para el popup */
+        #popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            z-index: 1000;
+        }
+
+        #popup h1 {
+            font-size: 24px;
+            color: #8B4513; /* Color café */
+        }
+
+        #popup p {
+            font-size: 18px;
+            color: #000000;
+        }
+
+        #popup button {
+            background-color: #FFD700; /* Color amarillo */
+            color: #8B4513; /* Color café */
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        #popup button:hover {
+            background-color: #FFA500; /* Color naranja al pasar el mouse */
+        }
+
+        /* Ocultar el canvas inicialmente */
+        canvas {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Popup inicial -->
+    <div id="popup">
+        <h1>¡Un Regalo Especial!</h1>
+        <p>Este es un regalo para la mujer más increíble de este mundo. 🌻</p>
+        <button id="startButton">Comenzar</button>
+    </div>
+
+    <!-- Canvas para la animación -->
+    <canvas id="sunflowerCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('sunflowerCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Array para almacenar las flores
+        const flowers = [];
+        const numFlowers = 21;
+
+        // Inicializar las flores en la parte inferior del canvas
+        for (let i = 0; i < numFlowers; i++) {
+            const x = (i / (numFlowers - 1)) * canvas.width; // Distribución uniforme en el eje X
+            const y = canvas.height - 100; // Un poco más arriba (100 píxeles desde el borde)
+            flowers.push({
+                x: x,
+                y: y,
+                angle: Math.random() * 360, // Ángulo inicial para la rotación de los pétalos
+                scale: 0.5 + Math.random() * 0.3, // Escala más pequeña
+            });
+        }
+
+        // Datos de la abejita
+        const bee = {
+            x: canvas.width / 2, // Posición inicial en el centro
+            y: canvas.height / 2, // Posición inicial en el centro
+            vx: 0, // Velocidad en el eje X
+            vy: 0, // Velocidad en el eje Y
+            speed: 3, // Velocidad de movimiento
+            radius: 25, // Radio de la abejita (más grande)
+        };
+
+        // Función para dibujar una flor
+        function drawSunflower(x, y, angle, scale) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.scale(scale, scale);
+
+            // Tallo
+            const stemLength = 200;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(0, stemLength);
+            ctx.strokeStyle = '#228B22';
+            ctx.lineWidth = 10;
+            ctx.stroke();
+
+            // Pétalos
+            for (let i = 0; i < 12; i++) {
+                ctx.save();
+                ctx.rotate((angle + i * 30) * Math.PI / 180);
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.bezierCurveTo(20, -50, 80, -50, 100, 0);
+                ctx.bezierCurveTo(80, 50, 20, 50, 0, 0);
+                ctx.fillStyle = '#FFD700';
+                ctx.fill();
+                ctx.restore();
+            }
+
+            // Centro
+            ctx.beginPath();
+            ctx.arc(0, 0, 20, 0, Math.PI * 2);
+            ctx.fillStyle = '#8B4513';
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // Función para dibujar la abejita
+        function drawBee() {
+            ctx.save();
+            ctx.translate(bee.x, bee.y);
+
+            // Cuerpo de la abejita (círculo amarillo)
+            ctx.beginPath();
+            ctx.arc(0, 0, bee.radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#FFD700';
+            ctx.fill();
+
+            // Rayas negras
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(-bee.radius, 0);
+            ctx.lineTo(bee.radius, 0);
+            ctx.stroke();
+
+            // Alas (círculos blancos con detalles)
+            ctx.fillStyle = '#FFFFFF';
+            ctx.beginPath();
+            ctx.arc(-bee.radius / 1.5, -bee.radius / 1.5, bee.radius / 1.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(bee.radius / 1.5, -bee.radius / 1.5, bee.radius / 1.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Detalles de las alas (líneas)
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(-bee.radius / 1.5, -bee.radius / 1.5);
+            ctx.lineTo(-bee.radius / 3, -bee.radius / 3);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(bee.radius / 1.5, -bee.radius / 1.5);
+            ctx.lineTo(bee.radius / 3, -bee.radius / 3);
+            ctx.stroke();
+
+            // Ojos (círculos negros)
+            ctx.fillStyle = '#000000';
+            ctx.beginPath();
+            ctx.arc(-bee.radius / 3, -bee.radius / 4, bee.radius / 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(bee.radius / 3, -bee.radius / 4, bee.radius / 8, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Sonrisa (arco)
+            ctx.beginPath();
+            ctx.arc(0, bee.radius / 6, bee.radius / 4, 0, Math.PI);
+            ctx.stroke();
+
+            // Antenas (líneas)
+            ctx.beginPath();
+            ctx.moveTo(-bee.radius / 3, -bee.radius / 2);
+            ctx.lineTo(-bee.radius / 2, -bee.radius);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(bee.radius / 3, -bee.radius / 2);
+            ctx.lineTo(bee.radius / 2, -bee.radius);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        // Función para dibujar textos
+        function drawTexts() {
+            ctx.font = '20px Arial';
+            ctx.fillStyle = '#000000';
+            ctx.textAlign = 'center';
+
+            // Texto para mover la abeja
+            ctx.fillText('Usa las flechas del teclado para mover a la abejita 🐝', canvas.width / 2, 30);
+
+            // Mensaje de amor
+            ctx.font = '30px Arial';
+            ctx.fillStyle = 'white'; // Color rosa
+            ctx.fillText('Te amo más que a las flores amarillas 🌻', canvas.width / 2, 70);
+
+            // Mensaje de "Feliz Día de las Flores Amarillas"
+            ctx.font = '25px Arial';
+            ctx.fillStyle = '#8B4513'; // Color café
+            ctx.fillText('¡Feliz Día de las Flores Amarillas! 🌼', canvas.width / 2, 110);
+        }
+
+        // Función para actualizar la posición de la abejita
+        function updateBee() {
+            // Mover la abejita según la velocidad
+            bee.x += bee.vx;
+            bee.y += bee.vy;
+
+            // Restricciones en los bordes del canvas
+            if (bee.x < bee.radius) bee.x = bee.radius; // Borde izquierdo
+            if (bee.x > canvas.width - bee.radius) bee.x = canvas.width - bee.radius; // Borde derecho
+            if (bee.y < bee.radius) bee.y = bee.radius; // Borde superior
+            if (bee.y > canvas.height - bee.radius) bee.y = canvas.height - bee.radius; // Borde inferior
+        }
+
+        // Función para manejar las teclas de flecha
+        function handleKeyDown(event) {
+            switch (event.key) {
+                case 'ArrowUp':
+                    bee.vy = -bee.speed; // Mover hacia arriba
+                    break;
+                case 'ArrowDown':
+                    bee.vy = bee.speed; // Mover hacia abajo
+                    break;
+                case 'ArrowLeft':
+                    bee.vx = -bee.speed; // Mover hacia la izquierda
+                    break;
+                case 'ArrowRight':
+                    bee.vx = bee.speed; // Mover hacia la derecha
+                    break;
+            }
+        }
+
+        // Función para detener el movimiento de la abejita al soltar una tecla
+        function handleKeyUp(event) {
+            switch (event.key) {
+                case 'ArrowUp':
+                case 'ArrowDown':
+                    bee.vy = 0; // Detener movimiento vertical
+                    break;
+                case 'ArrowLeft':
+                case 'ArrowRight':
+                    bee.vx = 0; // Detener movimiento horizontal
+                    break;
+            }
+        }
+
+        // Escuchar eventos de teclado
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+
+        // Función para iniciar la animación
+        function startAnimation() {
+            // Ocultar el popup
+            document.getElementById('popup').style.display = 'none';
+
+            // Mostrar el canvas
+            canvas.style.display = 'block';
+
+            // Iniciar la animación
+            animate();
+        }
+
+        // Asignar evento al botón de inicio
+        document.getElementById('startButton').addEventListener('click', startAnimation);
+
+        function animate() {
+            // Limpiar el canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Dibujar cada flor
+            flowers.forEach(flower => {
+                flower.angle += 1; // Rotar pétalos
+                drawSunflower(flower.x, flower.y, flower.angle, flower.scale);
+            });
+
+            // Dibujar los textos
+            drawTexts();
+
+            // Actualizar y dibujar la abejita
+            updateBee();
+            drawBee();
+
+            // Repetir la animación
+            requestAnimationFrame(animate);
+        }
+
+        // Redimensionar el canvas al cambiar el tamaño de la ventana
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            // Recalcular las posiciones de las flores
+            flowers.forEach((flower, i) => {
+                flower.x = (i / (numFlowers - 1)) * canvas.width;
+                flower.y = canvas.height - 100;
+            });
+        });
+    </script>
+</body>
+</html>
